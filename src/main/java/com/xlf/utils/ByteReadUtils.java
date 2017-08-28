@@ -1,0 +1,42 @@
+package com.xlf.utils;
+
+import com.xlf.utils.annotate.ByteReadField;
+import com.xlf.utils.annotate.ByteReadService;
+import com.xlf.utils.impl.TotalByteReadStrategyImpl;
+import com.xlf.utils.inter.ByteReadFunction;
+
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+
+/**
+ * author: xiaoliufu
+ * date:   2017/8/28.
+ * description:
+ */
+public class ByteReadUtils {
+    private ByteReadFunction byteReadFunction;
+
+    public ByteReadUtils(ByteReadFunction byteReadFunction) {
+        this.byteReadFunction = byteReadFunction;
+    }
+
+    /**
+     * 调用target对象进行属性注入
+     *
+     * @param target
+     * @throws Exception
+     */
+    public void invoke(Object target) throws Exception {
+        ByteReadService byteReadService = target.getClass().getAnnotation(ByteReadService.class);
+        //设置请求路径
+        String path = byteReadService.path();
+        byteReadFunction.setPath(path);
+        //获取所有属性
+        Field[] fields = target.getClass().getDeclaredFields();
+        //设置读取策略
+        ByteReadStrategy byteReadStrategy = new TotalByteReadStrategyImpl(byteReadFunction);
+        byteReadStrategy.read(fields, target);
+    }
+}
