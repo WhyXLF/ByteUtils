@@ -33,10 +33,8 @@ public class ByteReadUtils {
         //设置请求路径
         String path = byteReadService.path();
         byteReadFunction.setPath(path);
-        //获取所有属性
-        Field[] fields = target.getClass().getDeclaredFields();
         //设置读取策略
         ByteReadStrategy byteReadStrategy = new TotalByteReadStrategyImpl(byteReadFunction);
-        byteReadStrategy.read(fields, target);
+        byteReadStrategy.read(target);
     }
 }

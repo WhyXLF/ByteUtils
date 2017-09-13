@@ -16,7 +16,7 @@ public class ByteReadUtilsTest {
         ByteReadUtils byteReadUtils = new ByteReadUtils(new TempByteReadFunctionImpl());
         TestByteRead testByteRead = new TestByteRead();
         byteReadUtils.invoke(testByteRead);
-        System.out.println(testByteRead.getA());
+        System.out.println(testByteRead.toString());
     }
 
 }

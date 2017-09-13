@@ -13,9 +13,8 @@ public interface ByteReadStrategy {
     /**
      * 字节读取策略
      *
-     * @param fields
      * @param obj
      */
-    void read(Field[] fields, Object obj) throws IllegalAccessException;
+    void read(Object obj) throws IllegalAccessException, InstantiationException;
 
 }

@@ -16,15 +16,17 @@ public class TempByteReadFunctionImpl implements ByteReadFunction {
     @Override
     public byte[] read(int size) {
         char chars[] = new char[size];
-        char tmp = 'a';
-        for (int i = 0; i < size; i++) {
-            chars[i] = tmp++;
-        }
+        chars[0]= 'a';
+        chars[1]= 'b';
+        chars[2]= 'c';
+        chars[3]= '1';
+        chars[4]= '2';
+
         return ByteCharUtils.getBytes(chars);
     }
 
     @Override
     public int hasNext() {
-        return 100;
+        return 5;
     }
 }

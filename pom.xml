@@ -13,6 +13,16 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
         </dependency>
+        <dependency>
+            <groupId>org.jodd</groupId>
+            <artifactId>jodd-bean</artifactId>
+            <version>3.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>22.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
