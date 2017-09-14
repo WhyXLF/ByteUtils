@@ -1,9 +1,7 @@
 package com.xlf.utils;
 
-import com.xlf.utils.impl.TempByteReadFunctionImpl;
+import com.xlf.utils.impl.FileByteReadFunctionImpl;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * author: xiaoliufu
@@ -13,7 +11,7 @@ import static org.junit.Assert.*;
 public class ByteReadUtilsTest {
     @Test
     public void invoke() throws Exception {
-        ByteReadUtils byteReadUtils = new ByteReadUtils(new TempByteReadFunctionImpl());
+        ByteReadUtils byteReadUtils = new ByteReadUtils(new FileByteReadFunctionImpl());
         TestByteRead testByteRead = new TestByteRead();
         byteReadUtils.invoke(testByteRead);
         System.out.println(testByteRead.toString());
