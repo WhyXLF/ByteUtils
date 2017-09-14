@@ -155,6 +155,9 @@ public class TotalByteReadStrategyImpl implements ByteReadStrategy {
     private void checkAndSetField(Object obj, Field field, byte[] bytes) throws IllegalAccessException, InstantiationException {
         Class<?> fieldType = field.getType();
         String fieldName = field.getName();
+        if (field.getAnnotation(ByteReadField.class)==null && field.getAnnotation(ByteReadList.class)==null){
+            return;
+        }
         if (fieldType.equals(Integer.class) || fieldType == int.class) {
             intProperty(obj, field, bytes);
         } else if (fieldType.equals(Long.class) || fieldType == long.class) {
