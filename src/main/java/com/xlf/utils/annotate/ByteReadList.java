@@ -15,5 +15,4 @@ import java.util.Map;
 @Target( ElementType.TYPE )
 @Retention( RetentionPolicy.RUNTIME )
 public @interface ByteReadList {
-    ByteReadListElement[] elements();
 }
