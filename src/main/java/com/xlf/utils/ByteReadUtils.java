@@ -1,6 +1,7 @@
 package com.xlf.utils;
 
 import com.xlf.utils.annotate.ByteReadService;
+import com.xlf.utils.impl.FileByteReadFunctionImpl;
 import com.xlf.utils.impl.TotalByteReadStrategyImpl;
 import com.xlf.utils.inter.ByteReadFunction;
 
@@ -11,6 +12,10 @@ import com.xlf.utils.inter.ByteReadFunction;
  */
 public class ByteReadUtils {
     private ByteReadFunction byteReadFunction;
+
+    public ByteReadUtils() {
+        byteReadFunction = new FileByteReadFunctionImpl();
+    }
 
     public ByteReadUtils(ByteReadFunction byteReadFunction) {
         this.byteReadFunction = byteReadFunction;
