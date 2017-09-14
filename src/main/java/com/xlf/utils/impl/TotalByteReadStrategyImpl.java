@@ -59,6 +59,7 @@ public class TotalByteReadStrategyImpl implements ByteReadStrategy {
 
     /**
      * 解析list对象
+     *
      * @param field
      * @param bytes
      * @return
@@ -166,11 +167,9 @@ public class TotalByteReadStrategyImpl implements ByteReadStrategy {
         } else if (fieldType.equals(String.class)) {
             stringProperty(obj, field, bytes);
         } else if (fieldType.equals(Double.class) || fieldType == double.class) {
-
+            doubleProperty(obj, field, bytes);
         } else if (fieldType.getName().startsWith("com.xlf")) {
-            Object o = fieldType.newInstance();
-            parseObject(o, bytes);
-            BeanUtil.pojo.setProperty(obj, fieldName, o);
+            objectProperty(obj,field,bytes);
         } else if (fieldType.equals(List.class)) {
             BeanUtil.pojo.setProperty(obj, fieldName, parseList(field, bytes));
         } else if (fieldType.equals(Map.class)) {
@@ -179,6 +178,20 @@ public class TotalByteReadStrategyImpl implements ByteReadStrategy {
                 throw new UnsupportedOperationException("暂时不支持对Map类型处理！");
             }
         }
+    }
+
+    private void objectProperty(Object obj, Field field, byte[] bytes) throws IllegalAccessException, InstantiationException {
+        ByteReadField annotation = field.getAnnotation(ByteReadField.class);
+        if (annotation== null){
+            return;
+        }
+        int start = annotation.start();
+        int end = annotation.end();
+        byte[] partBytes = getBytes(bytes, start, end);
+        String fieldName = field.getName();
+        Object o = field.getType().newInstance();
+        parseObject(o, partBytes);
+        BeanUtil.pojo.setProperty(obj, fieldName, o);
     }
 
 

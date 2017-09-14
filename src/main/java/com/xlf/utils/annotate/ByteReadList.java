@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * date:   2017/9/14.
  * description:
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ByteReadList {
     /**

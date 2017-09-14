@@ -10,6 +10,8 @@ import com.xlf.utils.annotate.ByteReadField;
 public class TestByteRead2 {
     @ByteReadField(start = 1,end = 4)
     private String a;
+    @ByteReadField(start = 5,end = 10)
+    private String b;
 
     public String getA() {
         return a;
@@ -19,10 +21,19 @@ public class TestByteRead2 {
         this.a = a;
     }
 
+    public String getB() {
+        return b;
+    }
+
+    public void setB(String b) {
+        this.b = b;
+    }
+
     @Override
     public String toString() {
         return "TestByteRead2{" +
                 "a='" + a + '\'' +
+                ", b='" + b + '\'' +
                 '}';
     }
 }
