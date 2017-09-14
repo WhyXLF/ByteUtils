@@ -14,5 +14,9 @@
 ``
 @ByteReadField(start = 1,end = 3)
 ``
-用于指定start和end获取指定的字符
+用于指定start和end获取指定的位置
+``
+@ByteReadList(part = 2,start = 1,end = 20)
+``
+仅对List类型可用，part指定list的size，start指定了读取字节的起始和结束位置
 

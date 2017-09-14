@@ -7,7 +7,6 @@ import com.xlf.utils.annotate.ByteReadField;
 import com.xlf.utils.annotate.ByteReadList;
 import com.xlf.utils.inter.ByteReadFunction;
 import jodd.bean.BeanUtil;
-import sun.tools.java.ClassType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -169,7 +168,7 @@ public class TotalByteReadStrategyImpl implements ByteReadStrategy {
         } else if (fieldType.equals(Double.class) || fieldType == double.class) {
             doubleProperty(obj, field, bytes);
         } else if (fieldType.getName().startsWith("com.xlf")) {
-            objectProperty(obj,field,bytes);
+            objectProperty(obj, field, bytes);
         } else if (fieldType.equals(List.class)) {
             BeanUtil.pojo.setProperty(obj, fieldName, parseList(field, bytes));
         } else if (fieldType.equals(Map.class)) {
@@ -182,7 +181,7 @@ public class TotalByteReadStrategyImpl implements ByteReadStrategy {
 
     private void objectProperty(Object obj, Field field, byte[] bytes) throws IllegalAccessException, InstantiationException {
         ByteReadField annotation = field.getAnnotation(ByteReadField.class);
-        if (annotation== null){
+        if (annotation == null) {
             return;
         }
         int start = annotation.start();
