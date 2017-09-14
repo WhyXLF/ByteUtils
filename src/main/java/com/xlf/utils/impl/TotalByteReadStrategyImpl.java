@@ -4,8 +4,10 @@ import com.google.common.collect.Lists;
 import com.xlf.utils.ByteCharUtils;
 import com.xlf.utils.ByteReadStrategy;
 import com.xlf.utils.annotate.ByteReadField;
+import com.xlf.utils.annotate.ByteReadList;
 import com.xlf.utils.inter.ByteReadFunction;
 import jodd.bean.BeanUtil;
+import sun.tools.java.ClassType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -39,6 +41,14 @@ public class TotalByteReadStrategyImpl implements ByteReadStrategy {
 
     }
 
+    /**
+     * 解析单个对象
+     *
+     * @param object
+     * @param bytes
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
     private void parseObject(Object object, byte[] bytes) throws InstantiationException, IllegalAccessException {
         Class<?> objClass = object.getClass();
         List<Field> fields = getAllFields(objClass);
@@ -46,6 +56,101 @@ public class TotalByteReadStrategyImpl implements ByteReadStrategy {
             checkAndSetField(object, field, bytes);
         }
     }
+
+    /**
+     * 解析list对象
+     * @param field
+     * @param bytes
+     * @return
+     */
+    private List parseList(Field field, byte[] bytes) {
+        ByteReadList annotation = field.getAnnotation(ByteReadList.class);
+        //没有注解则直接结束
+        if (annotation == null) {
+            return Lists.newArrayList();
+        }
+        int start = annotation.start();
+        int end = annotation.end();
+        int part = annotation.part();
+        int partSize = (end - start + 1) / part;
+        Type genericType = field.getGenericType();
+        if (genericType instanceof ParameterizedType) {
+            ParameterizedType pt = (ParameterizedType) genericType;
+            //得到泛型里的class类型对象
+            Class<?> genericClazz = (Class<?>) pt.getActualTypeArguments()[0];
+            int index = start;
+
+            if (genericClazz.equals(String.class)) {
+                List<String> list = Lists.newArrayList();
+                for (int i = 0; i < part; i++) {
+                    list.add(new String(ByteCharUtils.getChars(getBytes(bytes, index, index + partSize - 1))));
+                    index = index + partSize;
+                }
+                return list;
+            } else if (genericClazz.equals(Integer.class)) {
+                List<Integer> list = Lists.newArrayList();
+                for (int i = 0; i < part; i++) {
+                    String tmpStr = new String(ByteCharUtils.getChars(getBytes(bytes, index, index + partSize - 1)));
+                    int intResult = Integer.parseInt(tmpStr);
+                    list.add(intResult);
+                    index = index + partSize;
+                }
+                return list;
+            } else if (genericClazz.equals(Boolean.class)) {
+                List<Boolean> list = Lists.newArrayList();
+                for (int i = 0; i < part; i++) {
+                    String tmpStr = new String(ByteCharUtils.getChars(getBytes(bytes, index, index + partSize - 1)));
+                    boolean booleanResult = Boolean.parseBoolean(tmpStr);
+                    list.add(booleanResult);
+                    index = index + partSize;
+                }
+                return list;
+            } else if (genericClazz.equals(Character.class)) {
+                List<Character> list = Lists.newArrayList();
+                for (int i = 0; i < part; i++) {
+                    String tmpStr = new String(ByteCharUtils.getChars(getBytes(bytes, index, index + partSize - 1)));
+                    char charResult = tmpStr.charAt(0);
+                    list.add(charResult);
+                    index = index + partSize;
+                }
+                return list;
+            } else if (genericClazz.equals(Double.class)) {
+                List<Double> list = Lists.newArrayList();
+                for (int i = 0; i < part; i++) {
+                    String tmpStr = new String(ByteCharUtils.getChars(getBytes(bytes, index, index + partSize - 1)));
+                    double doubleResult = Double.parseDouble(tmpStr);
+                    list.add(doubleResult);
+                    index = index + partSize;
+                }
+                return list;
+            } else if (genericClazz.equals(Long.class)) {
+                List<Long> list = Lists.newArrayList();
+                for (int i = 0; i < part; i++) {
+                    String tmpStr = new String(ByteCharUtils.getChars(getBytes(bytes, index, index + partSize - 1)));
+                    long longResult = Long.parseLong(tmpStr);
+                    list.add(longResult);
+                    index = index + partSize;
+                }
+                return list;
+            } else {
+                try {
+                    List<Object> list = Lists.newArrayList();
+                    for (int i = 0; i < part; i++) {
+                        Object o = genericClazz.newInstance();
+                        byte[] innerBytes = getBytes(bytes, index, index + partSize - 1);
+                        parseObject(o, innerBytes);
+                        list.add(o);
+                        index = index + partSize;
+                    }
+                    return list;
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return Lists.newArrayList();
+    }
+
 
     private void checkAndSetField(Object obj, Field field, byte[] bytes) throws IllegalAccessException, InstantiationException {
         Class<?> fieldType = field.getType();
@@ -60,19 +165,14 @@ public class TotalByteReadStrategyImpl implements ByteReadStrategy {
             charProperty(obj, field, bytes);
         } else if (fieldType.equals(String.class)) {
             stringProperty(obj, field, bytes);
+        } else if (fieldType.equals(Double.class) || fieldType == double.class) {
+
         } else if (fieldType.getName().startsWith("com.xlf")) {
             Object o = fieldType.newInstance();
             parseObject(o, bytes);
             BeanUtil.pojo.setProperty(obj, fieldName, o);
         } else if (fieldType.equals(List.class)) {
-            Type genericType = field.getGenericType();
-            if (genericType instanceof ParameterizedType) {
-                ParameterizedType pt = (ParameterizedType) genericType;
-                //得到泛型里的class类型对象
-                Class<?> genericClazz = (Class<?>) pt.getActualTypeArguments()[0];
-                //TODO
-                throw new UnsupportedOperationException("暂时不支持对List类型处理！");
-            }
+            BeanUtil.pojo.setProperty(obj, fieldName, parseList(field, bytes));
         } else if (fieldType.equals(Map.class)) {
             Type genericType = field.getGenericType();
             if (genericType instanceof ParameterizedType) {
@@ -132,6 +232,22 @@ public class TotalByteReadStrategyImpl implements ByteReadStrategy {
     }
 
     /**
+     * 设置double值
+     *
+     * @param obj
+     * @param field
+     * @param bytes
+     */
+    private void doubleProperty(Object obj, Field field, byte[] bytes) {
+        ByteReadField annotation = field.getAnnotation(ByteReadField.class);
+        int start = annotation.start();
+        int end = annotation.end();
+        String tmp = new String(ByteCharUtils.getChars(getBytes(bytes, start, end)));
+        double resultDouble = Double.parseDouble(tmp);
+        BeanUtil.pojo.setProperty(obj, field.getName(), resultDouble);
+    }
+
+    /**
      * 设置boolean值
      *
      * @param obj
@@ -159,8 +275,8 @@ public class TotalByteReadStrategyImpl implements ByteReadStrategy {
         int start = annotation.start();
         int end = annotation.end();
         char[] chars = ByteCharUtils.getChars(getBytes(bytes, start, end));
-        char resultchar = chars[0];
-        BeanUtil.pojo.setProperty(obj, field.getName(), resultchar);
+        char resultChar = chars[0];
+        BeanUtil.pojo.setProperty(obj, field.getName(), resultChar);
     }
 
     /**
