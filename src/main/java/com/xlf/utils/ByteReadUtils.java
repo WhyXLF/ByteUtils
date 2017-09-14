@@ -1,14 +1,8 @@
 package com.xlf.utils;
 
-import com.xlf.utils.annotate.ByteReadField;
 import com.xlf.utils.annotate.ByteReadService;
 import com.xlf.utils.impl.TotalByteReadStrategyImpl;
 import com.xlf.utils.inter.ByteReadFunction;
-
-import java.lang.reflect.Field;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 
 /**
  * author: xiaoliufu
