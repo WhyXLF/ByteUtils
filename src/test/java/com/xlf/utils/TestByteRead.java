@@ -8,7 +8,7 @@ import com.xlf.utils.annotate.ByteReadService;
  * date:   2017/8/28.
  * description:
  */
-@ByteReadService(path = "http://www.baidu.com")
+@ByteReadService(path = "./record1.txt")
 public class TestByteRead {
     @ByteReadField(start = 1,end = 3)
     private String a;

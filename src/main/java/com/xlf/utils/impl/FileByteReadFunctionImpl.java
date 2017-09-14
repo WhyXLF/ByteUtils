@@ -1,7 +1,9 @@
 package com.xlf.utils.impl;
 
 import com.xlf.utils.inter.ByteReadFunction;
+import com.xlf.utils.props.PropertyUtils;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -23,7 +25,7 @@ public class FileByteReadFunctionImpl implements ByteReadFunction {
             URL resource = FileByteReadFunctionImpl.class.getClassLoader().getResource(path);
             if (resource != null) {
                 StringBuilder stringBuilder = new StringBuilder();
-                List<String> lines = Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8);
+                List<String> lines = Files.readAllLines(Paths.get(resource.getPath()), StandardCharsets.UTF_8);
                 for (String line : lines) {
                     stringBuilder.append(line);
                 }
